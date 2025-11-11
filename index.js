@@ -24,7 +24,7 @@ async function run() {
     await client.connect();
     const addArtwork = client.db('serverDB')
     const addArtworkCollection = addArtwork.collection('addArtwork')
-    
+    const addLikesCollection = addArtwork.collection('likes')
 
     app.post("/addArtwork",async (req,res)=>{
         const newUser = req.body;
@@ -45,8 +45,35 @@ async function run() {
         res.send(result)
     })
 
-   
+    app.get('/latest-addArtwork', async (req ,res)=>{
+        const result = await addArtworkCollection.find().sort({createdAt: 'desc'}).limit(6).toArray();
+
+        res.send(result)
+    })
     
+    
+    
+
+    app.post("/likes/:id", async (req, res)=>{
+        const data = req.body;
+        const id = req.params.id;
+        const result = await addLikesCollection.insertOne(data)
+        const filter = { _id: new ObjectId(id)}
+        const update = {
+            $inc: {
+                likes: 1
+            }
+        }
+        
+        const likesCount = await addArtworkCollection.updateOne(filter,update)
+        res.send({result,likesCount})
+    })
+    
+    app.get('/my-gallery', async (req, res) =>{
+        const email = req.query.email
+        const result = await addArtworkCollection.find({email: email}).toArray()
+        res.send(result)
+    })
     
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
