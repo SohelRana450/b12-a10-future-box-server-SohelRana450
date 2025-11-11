@@ -24,8 +24,13 @@ async function run() {
     await client.connect();
     const addArtwork = client.db('serverDB')
     const addArtworkCollection = addArtwork.collection('addArtwork')
-    const addLikesCollection = addArtwork.collection('likes')
+    
 
+    app.post("/addArtwork",async (req,res)=>{
+        const newUser = req.body;
+        const result = await addArtworkCollection.insertOne(newUser);
+        res.send(result)
+    })
     app.get("/addArtwork", async (req, res)=>{
         const cursor = addArtworkCollection.find();
         const result = await cursor.toArray();
@@ -40,33 +45,7 @@ async function run() {
         res.send(result)
     })
 
-    app.get('/latest-addArtwork', async (req ,res)=>{
-        const result = await addArtworkCollection.find().sort({createdAt: 'desc'}).limit(6).toArray();
-
-        res.send(result)
-    })
-    app.post("/addArtwork",async (req,res)=>{
-        const newUser = req.body;
-        const result = await addArtworkCollection.insertOne(newUser);
-        res.send(result)
-    })
-    
-    
-
-    app.post("/likes/:id", async (req, res)=>{
-        const data = req.body;
-        const id = req.params.id;
-        const result = await addLikesCollection.insertOne(data)
-        const filter = { _id: new ObjectId(id)}
-        const update = {
-            $inc: {
-                likes: 1
-            }
-        }
-        
-        const likesCount = await addArtworkCollection.updateOne(filter,update)
-        res.send({result,likesCount})
-    })
+   
     
     
     await client.db("admin").command({ ping: 1 });
