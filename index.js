@@ -72,7 +72,29 @@ async function run() {
 
     app.post('/favoriteArt', async (req,res) => {
         const data = req.body;
+        
     const result = await addFavoritesCollection.insertOne(data)
+        res.send(result)
+    })
+
+    app.get('/my-favoriteArt', async (req, res) => {
+        const email = req.query.email
+        const result = await addFavoritesCollection.find({favorite_by: email, }).toArray()
+        res.send(result)
+
+    })
+    app.get('/favoriteArt/:id', async (req ,res) =>{
+        const id = req.params.id
+        const query = {_id: id}
+        const result = await addFavoritesCollection.findOne(query);
+        res.send(result)
+    })
+
+    app.delete('/favoriteArt/:id', async (req, res) =>{
+        
+        const id = req.params.id
+        const filter = ({ _id: id})
+        const result = await addFavoritesCollection.deleteOne(filter);
         res.send(result)
     })
 
