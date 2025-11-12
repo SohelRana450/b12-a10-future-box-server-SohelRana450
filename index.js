@@ -84,6 +84,13 @@ async function run() {
         const result = await addArtworkCollection.updateOne(filter , update)
         res.send(result)
     })
+
+    app.delete('/addArtwork/:id', async (req, res) =>{
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id)};
+        const result = await addArtworkCollection.deleteOne(filter);
+        res.send(result)
+    })
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
