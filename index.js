@@ -74,7 +74,16 @@ async function run() {
         const result = await addArtworkCollection.find({email: email}).toArray()
         res.send(result)
     })
-    
+    app.put('/addArtwork/:id', async (req,res) =>{
+        const id = req.params.id;
+        const data = req.body;
+        const filter = { _id: new ObjectId(id)}
+        const update = {
+            $set: data
+        }
+        const result = await addArtworkCollection.updateOne(filter , update)
+        res.send(result)
+    })
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
