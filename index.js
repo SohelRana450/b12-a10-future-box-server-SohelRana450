@@ -25,6 +25,7 @@ async function run() {
     const addArtwork = client.db('serverDB')
     const addArtworkCollection = addArtwork.collection('addArtwork')
     const addLikesCollection = addArtwork.collection('likes')
+    const addFavoritesCollection = addArtwork.collection('favoriteArt')
 
     app.post("/addArtwork",async (req,res)=>{
         const newUser = req.body;
@@ -68,12 +69,19 @@ async function run() {
         const likesCount = await addArtworkCollection.updateOne(filter,update)
         res.send({result,likesCount})
     })
-    
+
+    app.post('/favoriteArt', async (req,res) => {
+        const data = req.body;
+    const result = await addFavoritesCollection.insertOne(data)
+        res.send(result)
+    })
+
     app.get('/my-gallery', async (req, res) =>{
         const email = req.query.email
         const result = await addArtworkCollection.find({email: email}).toArray()
         res.send(result)
     })
+
     app.put('/addArtwork/:id', async (req,res) =>{
         const id = req.params.id;
         const data = req.body;
